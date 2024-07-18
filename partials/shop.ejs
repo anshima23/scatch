@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold">Shop</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="/" class="text-gray-600 hover:text-gray-800">Home</a></li>
+                    <li><a href="/cart" class="text-gray-600 hover:text-gray-800">Cart</a></li>
+                    <li><a href="/logout" class="text-gray-600 hover:text-gray-800">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- Product Card Example -->
+            <% for (let product of products) { %>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h2 class="text-lg font-semibold"><%= product.name %></h2>
+                        <p class="text-gray-600 mt-2">$<%= product.price.toFixed(2) %></p>
+                        <div class="mt-4 flex justify-between items-center">
+                            <a href="#" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none">Add to Cart</a>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <footer class="bg-gray-200 py-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Shop. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
