@@ -93,4 +93,16 @@ router.get("/products", (req, res) => {
     res.render("partials/products"); // Assuming you have a products.ejs in partials folder
 });
 
+router.get("/shop", (req, res) => {
+    // Example data, replace this with actual data from your database or other source
+    const products = [
+        { name: 'Product 1', image: 'path/to/image1.jpg', price: 29.99 },
+        { name: 'Product 2', image: 'path/to/image2.jpg', price: 39.99 },
+        // Add more products as needed
+    ];
+
+    // Render the shop page with products data
+    res.render("partials/shop", { products });
+});
+
 module.exports = router;
