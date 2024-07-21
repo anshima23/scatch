@@ -4,10 +4,30 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user-model");
 const flash = require("connect-flash");
+const Product = require('../models/product-model'); 
 
 // Middleware
 router.use(flash());
+router.post('/createproducts', async (req, res) => {
+    try {
+        const { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
+        const product = new Product({
+            name,
+            price,
+            discount,
+            bgcolor,
+            panelcolor,
+            textcolor,
+            // Handle image if applicable
+        });
 
+        await product.save();
+        res.redirect('/shop'); // Redirect or respond as needed
+    } catch (error) {
+        console.error('Error adding product:', error);
+        res.status(500).send('Server Error');
+    }
+});
 // Render home page
 router.get("/", (req, res) => {
     res.render("partials/home");
