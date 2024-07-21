@@ -1,37 +1,43 @@
 const express = require("express");
 const router = express.Router();
-const isloggedin = require("../middlewares/isLoggedIn");
+const isLoggedIn = require("../middlewares/isLoggedIn"); // Corrected import
+const userModel = require("../models/user-model");
+const productModel = require("../models/product-model");
 
-router.get("/",function(req,res){
+// Render home page with potential error message
+router.get("/", function (req, res) {
     let error = req.flash("error");
-    res.render("index",{error});
+    res.render("index", { error, isLoggedIn: false });
 });
 
-// In your route handler (e.g., indexRouter.js)
-// In your route handler (e.g., indexRouter.js)
-router.get('/shop', (req, res) => {
-    const product = {
-        image: 'url-to-image',  // Replace with actual image URL
-        name: 'Product Name',
-        price: 19.99
-    };
-    res.render('partials/shop', { product });
+// Render shop page with products if user is logged in
+router.get('/shop', isLoggedIn, async function (req, res) {
+    let products = await productModel.find();
+    let success = req.flash("success");
+    res.render("shop", { products, success });
 });
 
-
-router.get('/test', (req, res) => {
-    res.render('partials/shop', {
-        product: {
-            image: 'https://via.placeholder.com/150',
-            name: 'Test Product',
-            price: 29.99
-        }
-    });
-});
- 
-router.get("/logout",isloggedin,function (req,res){
-    res.render("shop");
+// Render cart page with user's cart items and calculated bill
+router.get("/cart", isLoggedIn, async function (req, res) {
+    let user = await userModel.findOne({ email: req.user.email }).populate("cart");
+    const bill = Number(user.cart[0].price) + 20 - Number(user.cart[0].discount);
+    res.render("cart", { user, bill });
 });
 
+// Add product to user's cart
+router.get("/addtocart/:id", isLoggedIn, async function (req, res) {
+    let user = await userModel.findOne({ email: req.user.email });
+    user.cart.push(req.params.id); // Corrected to req.params.id
+    await user.save();
+    req.flash("success", "Added to cart");
+    res.redirect("/shop"); // Corrected redirection
+});
+
+// Handle user logout
+router.get("/logout", isLoggedIn, function (req, res) {
+    res.clearCookie("token"); // Clear token cookie
+    req.flash("success", "Logged out successfully");
+    res.redirect("/"); // Redirect to home or login page
+});
 
 module.exports = router;

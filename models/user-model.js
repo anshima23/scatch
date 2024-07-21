@@ -20,10 +20,10 @@ const userSchema = mongoose.Schema({
         enum: ['user', 'owner'],
         default: 'user'
     },
-    cart: {
-        type: Array,
-        default: []
-    },
+    cart: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"product",
+    }],
     orders: {
         type: Array,
         default: []
