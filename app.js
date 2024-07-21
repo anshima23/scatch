@@ -1,55 +1,48 @@
-// app.js
-
 const express = require("express");
-const app = express();
-const cookieParser = require("cookie-parser");
 const path = require("path");
-const ownersRouter = require("./routes/ownersRouter");
-const productsRouter = require("./routes/productsRouter");
-const usersRouter = require("./routes/usersRouter");
-const db = require("./config/mongoose-connection");
+const mongoose = require("mongoose");
 const expressSession = require("express-session");
 const flash = require("connect-flash");
-const indexRouter = require("./routes/indexRouter"); // Ensure this is correctly imported
+const dotenv = require("dotenv");
 
-require("dotenv").config();
+dotenv.config();
 
-// Middleware
+const mongoUri = process.env.MONGO_URI;
+
+mongoose.connect(mongoUri, {
+    // Removed deprecated options
+})
+.then(() => console.log('Database connected successfully'))
+.catch(err => console.error('Database connection error:', err));
+
+const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(
-    expressSession({
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.EXPRESS_SESSION_SECRET,
-    })
-);
+app.use(expressSession({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 app.use(flash());
-app.use(express.static(path.join(__dirname, "public")));
+
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+const indexRouter = require("./routes/indexRouter");
+const productsRouter = require("./routes/productsRouter");
+const adminRouter = require("./routes/adminRouter");
 
-// Routes
-app.use("/", indexRouter); // Mount indexRouter for the root route
-app.use("/owners", ownersRouter);
-app.use("/users", usersRouter);
-app.use("/products", productsRouter);
-app.use('/owners', ownersRouter);
+app.use("/", indexRouter);
+app.use("/", productsRouter);
+app.use("/", adminRouter);
 
-
-
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
-// Ensure the database is connected before starting the server
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log("Connected to the database");
-    app.listen(3000, () => {
-        console.log("Server is running on port 3000");
-    });
+app.listen(3000, () => {
+    console.log("Server is running on port 3000");
 });

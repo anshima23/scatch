@@ -1,0 +1,89 @@
+<!-- views/partials/cart.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white border-r border-gray-200 p-4">
+            <h2 class="text-lg font-semibold mb-4">Sort by</h2>
+            <ul class="space-y-2">
+                <li><button class="w-full py-2 px-4 text-left bg-gray-100 rounded hover:bg-gray-200">Popular</button></li>
+                <li><button class="w-full py-2 px-4 text-left bg-gray-100 rounded hover:bg-gray-200">New Collection</button></li>
+                <li><button class="w-full py-2 px-4 text-left bg-gray-100 rounded hover:bg-gray-200">All Products</button></li>
+                <li><button class="w-full py-2 px-4 text-left bg-gray-100 rounded hover:bg-gray-200">Discounted Products</button></li>
+            </ul>
+
+            <h2 class="text-lg font-semibold mt-8 mb-4">Filter by:</h2>
+            <div class="space-y-2">
+                <div>
+                    <h3 class="font-medium">Availability</h3>
+                    <select class="w-full p-2 border border-gray-300 rounded">
+                        <option>In Stock</option>
+                        <option>Out of Stock</option>
+                    </select>
+                </div>
+                <div>
+                    <h3 class="font-medium">Discount</h3>
+                    <select class="w-full p-2 border border-gray-300 rounded">
+                        <option>10% and above</option>
+                        <option>20% and above</option>
+                        <option>30% and above</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 p-4">
+            <h1 class="text-3xl font-bold mb-8">CARDS</h1>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+                <% for (let i = 0; i < 12; i++) { %>
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden p-2">
+                        <img src="https://via.placeholder.com/150" alt="Placeholder Image" class="w-full h-32 object-cover mb-2">
+                        <div class="p-2">
+                            <h2 class="text-sm font-semibold mb-1">Card Name <%= i + 1 %></h2>
+                            <p class="text-gray-500 text-xs mb-2">$<%= (i + 1) * 10 %></p>
+                            <div class="flex items-center justify-between">
+                                <button class="add-btn bg-gray-200 text-gray-700 rounded-full p-1 hover:bg-gray-300 text-xs" data-item-id="<%= i %>">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path>
+                                    </svg>
+                                </button>
+                                <span class="text-gray-800 text-xs">0</span>
+                                <button class="remove-btn bg-gray-200 text-gray-700 rounded-full p-1 hover:bg-gray-300 text-xs" data-item-id="<%= i %>">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include your JavaScript here -->
+    <script>
+        document.querySelectorAll('.add-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const itemId = button.dataset.itemId;
+                // Handle add item logic here (e.g., send an AJAX request to update quantity)
+            });
+        });
+
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const itemId = button.dataset.itemId;
+                // Handle remove item logic here (e.g., send an AJAX request to update quantity)
+            });
+        });
+    </script>
+</body>
+</html>

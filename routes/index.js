@@ -10,4 +10,10 @@ router.get("/",function(req,res){
 router.get("/shop",isloggedin,function (req,res){
     res.render("shop");
 });
+
+router.get("/logout",isloggedin,function (req,res){
+    res.render("shop");
+});
+
+
 module.exports = router;
