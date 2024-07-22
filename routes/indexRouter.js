@@ -8,49 +8,32 @@ const Product = require('../models/product-model');
 
 // Middleware
 router.use(flash());
-router.post('/createproducts', async (req, res) => {
-    try {
-        const { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
-        const product = new Product({
-            name,
-            price,
-            discount,
-            bgcolor,
-            panelcolor,
-            textcolor,
-            // Handle image if applicable
-        });
-
-        await product.save();
-        res.redirect('/shop'); // Redirect or respond as needed
-    } catch (error) {
-        console.error('Error adding product:', error);
-        res.status(500).send('Server Error');
-    }
-});
 // Render home page
 router.get("/", (req, res) => {
     res.render("partials/home");
 });
-
-// Render create account page
-router.get("/create-account", (req, res) => {
-    res.render("partials/createAccount");
-});
-
-// Render login page
-router.get("/login", (req, res) => {
-    res.render("partials/login", { error: req.flash('error') });
-});
-
-router.get("/cart", (req, res) => {
-    // Example placeholder data
-    const cartItems = [
-        { id: 1, name: 'Product 1', quantity: 1, price: 100 },
-        { id: 2, name: 'Product 2', quantity: 2, price: 200 },
-    ];
-
-    res.render("partials/cart", { cartItems });
+// Handle user login
+router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const user = await userModel.findOne({ email: username });
+        if (!user) {
+            req.flash('error', 'Invalid credentials');
+            return res.redirect("/login");
+        }
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            req.flash('error', 'Invalid credentials');
+            return res.redirect("/login");
+        }
+        const token = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_KEY, { expiresIn: '1h' });
+        res.cookie('token', token);
+        res.redirect("/products");
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Something went wrong');
+        res.redirect("/login");
+    }
 });
 
 // Handle user registration
@@ -84,29 +67,45 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Handle user login
-router.post("/login", async (req, res) => {
-    const { username, password } = req.body;
+router.post('/createproducts', async (req, res) => {
     try {
-        const user = await userModel.findOne({ email: username });
-        if (!user) {
-            req.flash('error', 'Invalid credentials');
-            return res.redirect("/login");
-        }
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            req.flash('error', 'Invalid credentials');
-            return res.redirect("/login");
-        }
-        const token = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_KEY, { expiresIn: '1h' });
-        res.cookie('token', token);
-        res.redirect("/products");
-    } catch (err) {
-        console.error(err);
-        req.flash('error', 'Something went wrong');
-        res.redirect("/login");
+        const { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
+        const product = new Product({
+            name,
+            price,
+            discount,
+            bgcolor,
+            panelcolor,
+            textcolor,
+            // Handle image if applicable
+        });
+
+        await product.save();
+        res.redirect('/shop'); // Redirect or respond as needed
+    } catch (error) {
+        console.error('Error adding product:', error);
+        res.status(500).send('Server Error');
     }
 });
+
+
+// Render create account page
+router.get("/create-account", (req, res) => {
+    res.render("partials/createAccount");
+});
+
+
+router.get("/cart", (req, res) => {
+    // Example placeholder data
+    const cartItems = [
+        { id: 1, name: 'Product 1', quantity: 1, price: 100 },
+        { id: 2, name: 'Product 2', quantity: 2, price: 200 },
+    ];
+
+    res.render("partials/cart", { cartItems });
+});
+
+
 
 // Render products page
 router.get("/products", (req, res) => {
@@ -123,14 +122,4 @@ router.get('/shop', (req, res) => {
     res.render('partials/shop', { product });
 });
 
-
-router.get('/test', (req, res) => {
-    res.render('partials/shop', {
-        product: {
-            image: 'https://via.placeholder.com/150',
-            name: 'Test Product',
-            price: 29.99
-        }
-    });
-});
 module.exports = router;
