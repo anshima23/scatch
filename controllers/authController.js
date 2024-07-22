@@ -26,19 +26,25 @@ module.exports.registerUser = async function (req, res) {
     }
 };
 
+
 module.exports.loginUser = async function (req, res) {
-    let { email, password } = req.body;
+    const { email, password } = req.body;
 
-    let user = await userModel.findOne({ email: email });
-    if (!user) return res.status(401).send("Email or Password incorrect");
+    try {
+        const user = await userModel.findOne({ email });
+        if (!user) return res.status(401).send("Email or Password incorrect");
 
-    const result = await bcrypt.compare(password, user.password);
-    if (result) {
-        let token = generateToken(user);
-        res.cookie("token", token);
-        res.send("You can login");
-    } else {
-        res.status(401).send("Email or Password incorrect");
+        const result = await bcrypt.compare(password, user.password);
+        if (result) {
+            const token = generateToken(user);
+            res.cookie("token", token);
+            res.send("You can login");
+        } else {
+            res.status(401).send("Email or Password incorrect");
+        }
+    } catch (err) {
+        console.error("Error during login:", err);
+        res.status(500).send("Something went wrong");
     }
 };
 

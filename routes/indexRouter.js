@@ -36,59 +36,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Handle user registration
-router.post("/register", async (req, res) => {
-    const { username, email, password, confirmPassword } = req.body;
-
-    if (password !== confirmPassword) {
-        req.flash('error', 'Passwords do not match');
-        return res.redirect("/create-account");
-    }
-
-    try {
-        console.log("Registering user:", username);
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new userModel({
-            fullname: username,
-            email: email,
-            password: hashedPassword,
-            role: 'user'
-        });
-        await newUser.save();
-
-        console.log("User registered successfully:", newUser);
-
-        res.redirect("/login");
-    } catch (err) {
-        console.error("Error during user registration:", err);
-        req.flash('error', 'Something went wrong');
-        res.redirect("/create-account");
-    }
-});
-
-router.post('/createproducts', async (req, res) => {
-    try {
-        const { name, price, discount, bgcolor, panelcolor, textcolor } = req.body;
-        const product = new Product({
-            name,
-            price,
-            discount,
-            bgcolor,
-            panelcolor,
-            textcolor,
-            // Handle image if applicable
-        });
-
-        await product.save();
-        res.redirect('/shop'); // Redirect or respond as needed
-    } catch (error) {
-        console.error('Error adding product:', error);
-        res.status(500).send('Server Error');
-    }
-});
-
-
 // Render create account page
 router.get("/create-account", (req, res) => {
     res.render("partials/createAccount");
