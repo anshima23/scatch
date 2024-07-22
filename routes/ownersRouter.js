@@ -34,35 +34,6 @@ router.post("/create", async function (req, res) {
     }
 });
 
-// Login route
-router.post("/login", async function (req, res) {
-    let { email, password } = req.body;
-
-    try {
-        // Find the user with the provided email
-        let user = await ownerModel.findOne({ email });
-
-        if (!user) {
-            return res.status(401).send('Invalid email or password');
-        }
-
-        // Compare the provided password with the stored hashed password
-        let isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).send('Invalid email or password');
-        }
-
-        // Generate a token
-        let token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        // Send the token to the client
-        res.json({ token });
-    } catch (err) {
-        console.error('Error logging in:', err);
-        res.status(500).send('Error logging in');
-    }
-});
 
 // Render admin dashboard or landing page for admins
 router.get("/admin", function (req, res) {
