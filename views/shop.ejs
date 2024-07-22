@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Ensure the body takes up full height and positions footer at the bottom */
+        html, body {
+            height: 100%;
+        }
+        .main-content {
+            flex: 1;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col">
     <header class="bg-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-semibold">Shop</h1>
@@ -20,37 +29,48 @@
         </div>
     </header>
 
-    <% if (success.length > 0) { %>
-        <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
-            <span class="inline-block mt-1 mb-1 text-white">
-                <%= success %>
-            </span>
-        </div>
-    <% } %>
-
-    <div class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Single Product Card Example -->
-            <% products.forEach(product => { %>
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h2 class="text-lg font-semibold"><%= product.name %></h2>
-                        <% if (typeof product.price === 'number') { %>
-                            <p class="text-gray-600 mt-2">$<%= product.price.toFixed(2) %></p>
-                        <% } else { %>
-                            <p class="text-gray-600 mt-2">Price not available</p>
-                        <% } %>
-                        <div class="mt-4 flex justify-between items-center">
-                            <a href="/addtocart/<%= product._id %>" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none">Add to Cart</a>
-                        </div>
+    <div class="main-content container mx-auto px-4 py-8 flex flex-col">
+        <!-- Headings on the left -->
+        <div class="flex mb-6">
+            <div class="w-1/4 pr-4">
+                <h2 class="text-xl font-semibold mb-4">All Products</h2>
+                <h2 class="text-xl font-semibold">Create New Product</h2>
+            </div>
+            <div class="w-3/4">
+                <% if (success.length > 0) { %>
+                    <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
+                        <span class="inline-block mt-1 mb-1 text-white">
+                            <%= success %>
+                        </span>
                     </div>
+                <% } %>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Single Product Card Example -->
+                    <% products.forEach(product => { %>
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden h-96 flex flex-col">
+                            <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-60 object-cover">
+                            <div class="p-4 flex flex-col flex-grow">
+                                <div class="flex flex-col flex-grow">
+                                    <h2 class="text-lg font-semibold"><%= product.name %></h2>
+                                    <% if (typeof product.price === 'number') { %>
+                                        <p class="text-gray-600 mt-2">$<%= product.price.toFixed(2) %></p>
+                                    <% } else { %>
+                                        <p class="text-gray-600 mt-2">Price not available</p>
+                                    <% } %>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="/addtocart/<%= product._id %>" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none w-full text-center">Add to Cart</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
                 </div>
-            <% }) %>
+            </div>
         </div>
     </div>
 
-    <footer class="bg-gray-200 py-4 mt-8">
+    <footer class="bg-gray-200 py-4 mt-auto">
         <div class="container mx-auto text-center">
             <p>&copy; 2024 Shop. All rights reserved.</p>
         </div>
