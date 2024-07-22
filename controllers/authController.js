@@ -2,23 +2,28 @@ const userModel = require("../models/user-model");
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../utils/generateToken");
 
+// Handle user registration
 module.exports.registerUser = async function (req, res) {
     try {
-        let { email, password, fullname } = req.body;
+        const { email, password, fullname } = req.body;
 
-        let user = await userModel.findOne({ email: email });
+        // Check if user already exists
+        const user = await userModel.findOne({ email });
         if (user) return res.status(401).send("You already have an account. Please login with another account.");
 
+        // Hash the password
         const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        let newUser = await userModel.create({
+        // Create a new user
+        const newUser = await userModel.create({
             email,
-            password: hash,
+            password: hashedPassword,
             fullname,
         });
 
-        let token = generateToken(newUser);
+        // Generate and set token
+        const token = generateToken(newUser);
         res.cookie("token", token);
         res.send("User created successfully");
     } catch (err) {
@@ -26,7 +31,7 @@ module.exports.registerUser = async function (req, res) {
     }
 };
 
-
+// Handle user login
 module.exports.loginUser = async function (req, res) {
     const { email, password } = req.body;
 
@@ -34,8 +39,9 @@ module.exports.loginUser = async function (req, res) {
         const user = await userModel.findOne({ email });
         if (!user) return res.status(401).send("Email or Password incorrect");
 
-        const result = await bcrypt.compare(password, user.password);
-        if (result) {
+        // Compare passwords
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
             const token = generateToken(user);
             res.cookie("token", token);
             res.send("You can login");
@@ -48,6 +54,7 @@ module.exports.loginUser = async function (req, res) {
     }
 };
 
+// Handle user logout
 module.exports.logout = function (req, res) {
     res.clearCookie("token");
     res.redirect("/");
