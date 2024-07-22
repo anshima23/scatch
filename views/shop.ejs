@@ -20,28 +20,33 @@
         </div>
     </header>
 
-    <% if(success.length>0){
-        %>
-        <div class="absolutetop-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
+    <% if (success.length > 0) { %>
+        <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
             <span class="inline-block mt-1 mb-1 text-white">
                 <%= success %>
-                </span>
-            </div>
-   <% } %>
+            </span>
+        </div>
+    <% } %>
 
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Single Product Card Example -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h2 class="text-lg font-semibold"><%= product.name %></h2>
-                    <p class="text-gray-600 mt-2">$<%= product.price.toFixed(2) %></p>
-                    <div class="mt-4 flex justify-between items-center">
-                        <a href="/addtocart/<%product._id> class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none">Add to Cart</a>
+            <% products.forEach(product => { %>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h2 class="text-lg font-semibold"><%= product.name %></h2>
+                        <% if (typeof product.price === 'number') { %>
+                            <p class="text-gray-600 mt-2">$<%= product.price.toFixed(2) %></p>
+                        <% } else { %>
+                            <p class="text-gray-600 mt-2">Price not available</p>
+                        <% } %>
+                        <div class="mt-4 flex justify-between items-center">
+                            <a href="/addtocart/<%= product._id %>" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 focus:outline-none">Add to Cart</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <% }) %>
         </div>
     </div>
 

@@ -4,40 +4,66 @@ const isLoggedIn = require("../middlewares/isLoggedIn"); // Corrected import
 const userModel = require("../models/user-model");
 const productModel = require("../models/product-model");
 
-// Render home page with potential error message
+// Render home page with potential error messages
 router.get("/", function (req, res) {
-    let error = req.flash("error");
-    res.render("index", { error, isLoggedIn: false });
+    const messages = req.flash("error") || []; // Ensure messages is an array
+    res.render("index", { messages, isLoggedIn: false }); // Pass messages to view
 });
 
 // Render shop page with products if user is logged in
 router.get('/shop', isLoggedIn, async function (req, res) {
-    let products = await productModel.find();
-    let success = req.flash("success");
-    res.render("shop", { products, success });
+    try {
+        const products = await productModel.find();
+        const success = req.flash("success") || []; // Ensure success is an array
+        res.render("shop", { products, success });
+    } catch (err) {
+        console.error("Error fetching products:", err);
+        req.flash("error", "Unable to load products.");
+        res.redirect("/"); // Redirect to home or an error page
+    }
 });
 
 // Render cart page with user's cart items and calculated bill
 router.get("/cart", isLoggedIn, async function (req, res) {
-    let user = await userModel.findOne({ email: req.user.email }).populate("cart");
-    const bill = Number(user.cart[0].price) + 20 - Number(user.cart[0].discount);
-    res.render("cart", { user, bill });
+    try {
+        const user = await userModel.findOne({ email: req.user.email }).populate("cart");
+        if (!user || !user.cart.length) {
+            req.flash("error", "Cart is empty.");
+            return res.redirect("/shop");
+        }
+        const bill = user.cart.reduce((total, item) => total + Number(item.price) - Number(item.discount), 0) + 20; // Sum all item prices and apply discount
+        res.render("cart", { user, bill });
+    } catch (err) {
+        console.error("Error fetching cart items:", err);
+        req.flash("error", "Unable to load cart.");
+        res.redirect("/shop");
+    }
 });
 
 // Add product to user's cart
 router.get("/addtocart/:id", isLoggedIn, async function (req, res) {
-    let user = await userModel.findOne({ email: req.user.email });
-    user.cart.push(req.params.id); // Corrected to req.params.id
-    await user.save();
-    req.flash("success", "Added to cart");
-    res.redirect("/shop"); // Corrected redirection
+    try {
+        const user = await userModel.findOne({ email: req.user.email });
+        if (!user) {
+            req.flash("error", "User not found.");
+            return res.redirect("/shop");
+        }
+        user.cart.push(req.params.id); // Add product to cart
+        await user.save();
+        req.flash("success", "Added to cart");
+        res.redirect("/shop");
+    } catch (err) {
+        console.error("Error adding product to cart:", err);
+        req.flash("error", "Unable to add product to cart.");
+        res.redirect("/shop");
+    }
 });
 
 // Handle user logout
 router.get("/logout", isLoggedIn, function (req, res) {
-    res.clearCookie("token"); // Clear token cookie
+    res.clearCookie("token");
     req.flash("success", "Logged out successfully");
-    res.redirect("/"); // Redirect to home or login page
+    res.redirect("/"); // Redirect to home page
 });
 
 module.exports = router;

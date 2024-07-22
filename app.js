@@ -11,7 +11,7 @@ dotenv.config();
 const ownersRouter = require("./routes/ownersRouter");
 const productsRouter = require("./routes/productsRouter");
 const usersRouter = require("./routes/usersRouter");
-const indexRouter = require("./routes/index");
+const indexRouter = require("./routes/index"); // Corrected import
 
 // Import the mongoose connection
 require("./config/mongoose-connection");
@@ -28,15 +28,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(flash());
-app.use(express.static(path.join(__dirname, "public")));
+app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "ejs");
 
-app.use("/", indexRouter);
+// Routes
+app.use("/", indexRouter); // Use indexRouter
 app.use("/owners", ownersRouter);
-app.use("/users", usersRouter);
+app.use("/", usersRouter);
 app.use("/products", productsRouter);
 
+// Global Error Handler
 app.use((err, req, res, next) => {
+    console.error("Global Error Handler:", err);
     res.status(500).send('Something broke!');
 });
 
