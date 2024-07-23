@@ -10,12 +10,13 @@ router.get("/", function (req, res) {
     res.render("index", { messages, isLoggedIn: false }); // Pass messages to view
 });
 
-// Render shop page with products if user is logged in
 router.get('/shop', isLoggedIn, async function (req, res) {
     try {
         const products = await productModel.find();
         const success = req.flash("success") || []; // Ensure success is an array
-        res.render("shop", { products, success });
+        const user = req.user || null; // Get user from req object if available
+        
+        res.render("shop", { products, success, user }); // Pass user to the template
     } catch (err) {
         console.error("Error fetching products:", err);
         req.flash("error", "Unable to load products.");

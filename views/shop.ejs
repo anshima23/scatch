@@ -32,6 +32,9 @@
                 <ul class="flex space-x-4">
                     <li><a href="/" class="text-gray-600 hover:text-gray-800">Home</a></li>
                     <li><a href="/cart" class="text-gray-600 hover:text-gray-800">Cart</a></li>
+                    <% if (user && user.role === 'admin') { %>
+                        <li><a href="/admin/create-product" class="text-gray-600 hover:text-gray-800">Create New Product</a></li>
+                    <% } %>
                     <li><a href="/logout" class="text-gray-600 hover:text-gray-800">Logout</a></li>
                 </ul>
             </nav>
