@@ -11,43 +11,52 @@
             flex-grow: 1;
             overflow-x: hidden; /* Prevent horizontal scrolling */
         }
+        .card {
+            width: 100%;
+            max-width: 400px; /* Double the previous size */
+            aspect-ratio: 1; /* Ensures the card remains square */
+            margin-left: 5rem;
+        }
+        .details {
+            margin-left: 1rem; /* Adjust this value to control the space between the card and details */
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-200">
     <div class="flex">
-        <!-- Sidebar -->
-      
         <!-- Main content -->
         <div class="flex-1 p-4 main-content">
-            <h1 class="text-3xl font-bold mb-8">Your Cart</h1>
-            <div class="bg-white border border-gray-200 rounded-lg shadow-md p-4">
-                <% if (cart.length === 0) { %>
-                    <p class="text-center text-gray-500">Your cart is empty.</p>
-                <% } else { %>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                        <% cart.forEach(product => { %>
-                            <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden p-2">
-                                <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-32 object-cover mb-2">
-                                <div class="p-2">
-                                    <h2 class="text-sm font-semibold mb-1"><%= product.name %></h2>
-                                    <p class="text-gray-500 text-xs mb-2">$<%= product.price.toFixed(2) %></p>
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-gray-800 text-xs">Quantity: <%= product.quantity %></span>
-                                        <div class="flex items-center space-x-2">
-                                            <!-- Only include the minus button if needed -->
-                                            <button class="minus-btn bg-gray-200 text-gray-700 rounded-full p-1 hover:bg-gray-300 text-xs" data-item-id="<%= product._id %>">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
+            <h1 class="text-3xl font-bold mb-8 text-gray-800">Your Cart</h1>
+            <% if (cart.length === 0) { %>
+                <p class="text-center text-gray-500">Your cart is empty.</p>
+            <% } else { %>
+                <% cart.forEach(product => { %>
+                    <div class="flex items-center mb-4 bg-gray-100 p-4 rounded-lg shadow-md">
+                        <!-- Card Section -->
+                        <div class="card bg-gray-200 border border-gray-300 rounded-lg overflow-hidden">
+                            <img src="<%= product.image %>" alt="<%= product.name %>" class="w-full h-full object-cover">
+                        </div>
+                        <!-- Details Section -->
+                        <div class="flex-1 flex justify-center ml-4">
+                            <div class="text-center">
+                                <h2 class="text-lg font-semibold mb-1 text-gray-800"><%= product.name %></h2>
+                                <p class="text-gray-600 text-sm mb-2">$<%= product.price.toFixed(2) %></p>
+                                <div class="flex items-center mb-2 justify-center">
+                                    <span class="text-gray-700 text-sm">Quantity: <%= product.quantity %></span>
+                                </div>
+                                <!-- Minus Button Below Details -->
+                                <div class="flex items-center justify-center">
+                                    <button class="minus-btn bg-gray-300 text-gray-700 rounded-full p-1 hover:bg-gray-400 text-xs" data-item-id="<%= product._id %>">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                        <% }) %>
+                        </div>
                     </div>
-                <% } %>
-            </div>
+                <% }) %>
+            <% } %>
         </div>
     </div>
 
