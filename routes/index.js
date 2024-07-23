@@ -64,7 +64,50 @@ router.post("/addtocart/:id", isLoggedIn, async function (req, res) {
         res.redirect("/shop");
     }
 });
+// Remove item from cart
+router.delete('/removefromcart/:id', isLoggedIn, async function (req, res) {
+    try {
+        const user = await userModel.findOne({ email: req.user.email });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found.' });
+        }
+        user.cart = user.cart.filter(itemId => itemId.toString() !== req.params.id);
+        await user.save();
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error removing item from cart:', err);
+        res.json({ success: false, message: 'Unable to remove item from cart.' });
+    }
+});
 
+// Decrease item quantity in cart
+router.post('/decreasequantity/:id', isLoggedIn, async function (req, res) {
+    try {
+        const user = await userModel.findOne({ email: req.user.email });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found.' });
+        }
+        // Find the product in the cart and decrease the quantity
+        const productIndex = user.cart.findIndex(item => item._id.toString() === req.params.id);
+        if (productIndex === -1) {
+            return res.json({ success: false, message: 'Product not found in cart.' });
+        }
+        const product = user.cart[productIndex];
+        if (product.quantity > 1) {
+            product.quantity -= 1;
+            await user.save();
+            res.json({ success: true });
+        } else {
+            // If quantity is 1, remove the product from the cart
+            user.cart.splice(productIndex, 1);
+            await user.save();
+            res.json({ success: true });
+        }
+    } catch (err) {
+        console.error('Error decreasing item quantity:', err);
+        res.json({ success: false, message: 'Unable to decrease item quantity.' });
+    }
+});
 // Handle user logout
 router.get("/logout", isLoggedIn, function (req, res) {
     res.clearCookie("token");
