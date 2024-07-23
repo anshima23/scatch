@@ -43,6 +43,13 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
+app.use((req, res, next) => {
+    if (!req.session.cart) {
+        req.session.cart = []; // Initialize as an empty array
+    }
+    next();
+});
+
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
 });

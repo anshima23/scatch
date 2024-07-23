@@ -22,17 +22,17 @@ router.get('/shop', isLoggedIn, async function (req, res) {
         res.redirect("/"); // Redirect to home or an error page
     }
 });
-
-// Render cart page with user's cart items and calculated bill
-router.get("/cart", isLoggedIn, async function (req, res) {
+router.get('/cart', isLoggedIn, async function (req, res) {
     try {
-        const user = await userModel.findOne({ email: req.user.email }).populate("cart");
-        if (!user || !user.cart.length) {
-            req.flash("error", "Cart is empty.");
+        const user = await userModel.findOne({ email: req.user.email }).populate('cart'); // Populate cart with product details
+        if (!user) {
+            req.flash("error", "User not found.");
             return res.redirect("/shop");
         }
-        const bill = user.cart.reduce((total, item) => total + Number(item.price) - Number(item.discount), 0) + 20; // Sum all item prices and apply discount
-        res.render("cart", { user, bill });
+        const cart = user.cart; // Get the populated cart
+        const bill = cart.reduce((total, item) => total + Number(item.price) - Number(item.discount), 0) + 20; // Calculate total bill
+        
+        res.render('cart', { cart, bill }); // Render cart with product details and bill
     } catch (err) {
         console.error("Error fetching cart items:", err);
         req.flash("error", "Unable to load cart.");
@@ -40,15 +40,21 @@ router.get("/cart", isLoggedIn, async function (req, res) {
     }
 });
 
-// Add product to user's cart
-router.get("/addtocart/:id", isLoggedIn, async function (req, res) {
+router.post("/addtocart/:id", isLoggedIn, async function (req, res) {
     try {
         const user = await userModel.findOne({ email: req.user.email });
         if (!user) {
             req.flash("error", "User not found.");
             return res.redirect("/shop");
         }
-        user.cart.push(req.params.id); // Add product to cart
+
+        const product = await productModel.findById(req.params.id); // Retrieve product details
+        if (!product) {
+            req.flash("error", "Product not found.");
+            return res.redirect("/shop");
+        }
+
+        user.cart.push(product); // Add product details to cart
         await user.save();
         req.flash("success", "Added to cart");
         res.redirect("/shop");
