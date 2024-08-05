@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router(); // This initializes the router object
 const upload = require("../config/multer-config");
-const productModel = require("../models/product-model"); // Adjust the path if necessary
+const productModel = require("../../models/product-model"); // Adjust the path if necessary
 
 // Handle POST request to /create route
 router.post("/create", upload.single("productImage"), async function (req, res) {

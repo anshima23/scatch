@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const isLoggedIn = require("../middlewares/isLoggedIn"); // Corrected import
-const userModel = require("../models/user-model");
-const productModel = require("../models/product-model");
+const isLoggedIn = require("../../middlewares/isLoggedIn"); // Corrected import
+const userModel = require("../../models/user-model");
+const productModel = require("../../models/product-model");
 
 // Render home page with potential error messages
 router.get("/", function (req, res) {
